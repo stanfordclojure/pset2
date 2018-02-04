@@ -1,0 +1,19 @@
+parse = definition fields <';'>
+<space> = <#'[ \n\t\r]*'>
+definition = space #'[^{}\n\t\r]*' space
+<lbrack> = <'{'>
+<rbrack> = <'}'>
+
+
+field = space #'[^;]*' <';'> space
+fields = lbrack field+ rbrack
+
+(*
+expr = number | vector | operation
+operation = operator space+ vector
+operator = '+' | '-' | '*' | '/'
+vector = snumber+ number
+<snumber> = (number space)*
+<space> = <#'[ ]+'>
+number = #'[0-9]+'
+*)
