@@ -26,6 +26,47 @@
         (select (.toUpperCase n))) => '("BURKE" "DAVID" "FRANK")
   )
 
+(comment
+  "TRANFORM INTO"
+  (->> names
+    (filter (fn [n] (= (count n) 5)))
+    (sort-by (fn [n] n))
+    (map (fn [n] (.toUpperCase n))))
+  )
+
+
+(defmulti clause-transformer (fn [_ x] (first x)))
+
+(defmethod clause-transformer 'where [sym clause]
+  `(filter (fn [~sym] ~@(rest clause))))
+
+(defmethod clause-transformer 'orderby [sym clause]
+  `(sort-by (fn [~sym] ~@(rest clause))))
+
+(defmethod clause-transformer 'select [sym clause]
+  `(map (fn [~sym] ~@(rest clause))))
+
+(defmethod clause-transformer :default [clause] clause)
+
+(defmacro from [s _ coll & clauses]
+  (let [output `(->> ~coll)
+        transformed-clauses (map (partial clause-transformer s) clauses)]
+    (concat output transformed-clauses)))
+
+
+(macroexpand-1 '(from n in names
+      (where (= (count n) 5))
+      (orderby n)
+      (select (.toUpperCase n))))
+
+
+(from n in names
+      (where (= (count n) 5))
+      (orderby n)
+      (select (.toUpperCase n)))
+
+
+
 
 (defmacro from [& args])
 

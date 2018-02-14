@@ -5,7 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [enlive "1.1.6"]
-                 [instaparse "1.4.8"]]
+                 [instaparse "1.4.8"]
+                 [org.clojure/core.async "0.4.474"]]
   :main ^:skip-aot pset2.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
