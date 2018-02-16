@@ -1,4 +1,5 @@
 (ns pset2.core
+  (:require [clojure.pprint :refer [pprint]])
   (:gen-class))
 
 
@@ -25,6 +26,37 @@
         (orderby n)
         (select (.toUpperCase n))) => '("BURKE" "DAVID" "FRANK")
   )
+
+(->> names
+  (filter (fn [n] (= (count n) 5)))
+  (sort-by (fn [n] n))
+  (map (fn [n] (.toUpperCase n))))
+
+
+(defmulti clause-transformer (fn [_ clause] (first clause)))
+
+(defmethod clause-transformer 'where [sym clause]
+  `(filter (fn [~sym] ~(last clause))))
+(defmethod clause-transformer 'orderby [sym clause]
+  `(sort-by (fn [~sym] ~(last clause))))
+(defmethod clause-transformer 'select [sym clause]
+  `(map (fn [~sym] ~(last clause))))
+
+(defmacro from [sym _ coll & clauses]
+  {:pre [(symbol? sym)]}
+  (let [output `(->> ~coll)
+        query-clauses (map (partial clause-transformer sym) clauses)]
+    (concat output query-clauses)))
+
+(pprint (macroexpand-1
+  '(from n in names
+        (where (= (count n) 5))
+        (orderby n)
+        (select (.toUpperCase n)))))
+
+
+
+
 
 (comment
   "TRANFORM INTO"
